@@ -180,17 +180,26 @@
         async function getImageForLetter(letter) {
             const letterDir = letter.toLowerCase();
             try {
-                // Get directory contents
-                const directoryContents = await window.fs.readFile(`./${letterDir}`);
-                // Parse directory contents to get list of files
-                const files = JSON.parse(new TextDecoder().decode(directoryContents));
+                // Replace these with your actual GitHub repository details
+                const githubUser = '314esther';
+                const repoName = 'Secret_sentence_generator';
+                const branch = 'main';  // or 'master' depending on your default branch
+                
+                // Get directory contents using GitHub's API
+                const response = await fetch(`https://api.github.com/repos/${githubUser}/${repoName}/contents/${letterDir}?ref=${branch}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch directory contents for letter ${letter}`);
+                }
+                
+                const files = await response.json();
                 // Filter for PNG files
-                const pngFiles = files.filter(file => file.toLowerCase().endsWith('.png'));
+                const pngFiles = files.filter(file => file.name.toLowerCase().endsWith('.png'));
                 
                 if (pngFiles.length > 0) {
                     // Select random PNG file
-                    const randomIndex = Math.floor(Math.random() * pngFiles.length);
-                    return `./${letterDir}/${pngFiles[randomIndex]}`;
+                    const randomFile = pngFiles[Math.floor(Math.random() * pngFiles.length)];
+                    // Use the raw_url from GitHub's API response
+                    return `https://raw.githubusercontent.com/${githubUser}/${repoName}/${branch}/${letterDir}/${randomFile.name}`;
                 }
                 throw new Error(`No PNG files found in ${letterDir} directory`);
             } catch (error) {
