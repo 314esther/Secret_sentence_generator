@@ -131,19 +131,11 @@
         };
 
         // Function to get image path for letter
-        async function getImageForLetter(letter) {
+        function getImageForLetter(letter) {
             const letterDir = letter.toLowerCase();
-            try {
-                // Try to fetch the file directly
-                const response = await fetch(`./${letterDir}/first.png`);
-                if (!response.ok) {
-                    throw new Error(`Image not found in ${letterDir} directory`);
-                }
-                return `./${letterDir}/first.png`;
-            } catch (error) {
-                console.error(`Error accessing image for letter ${letter}:`, error);
-                return `/api/placeholder/100/100`;
-            }
+            // Using GitHub raw content URL pattern
+            // Replace 'your-username/your-repo' with your actual GitHub username and repository name
+            return `https://raw.githubusercontent.com/your-username/your-repo/main/${letterDir}/first.png`;
         }
 
         async function generateGame() {
@@ -166,7 +158,7 @@
                         imageContainer.className = 'image-container';
 
                         const img = document.createElement('img');
-                        img.src = await getImageForLetter(char);
+                        img.src = getImageForLetter(char);
                         img.alt = `Image for letter ${char}`;
                         img.onerror = function() {
                             this.src = `/api/placeholder/100/100`;
