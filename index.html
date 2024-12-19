@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letter Learning Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        #input-container {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #game-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .word-container {
+            display: inline-flex;
+            align-items: center;
+            margin: 5px;
+        }
+
+        .letter-box {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 2px;
+        }
+
+        .image-container {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 5px;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .letter-line {
+            width: 80px;
+            height: 2px;
+            background-color: #000;
+        }
+
+        .space {
+            width: 20px;
+            display: inline-block;
+        }
+
+        .punctuation {
+            display: inline-block;
+            font-size: 24px;
+            margin: 0 5px;
+            align-self: flex-end;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Letter Learning Game</h1>
+    <div id="input-container">
+        <input type="text" id="sentence-input" placeholder="Enter a sentence">
+        <button onclick="generateGame()">Generate Game</button>
+    </div>
+    <div id="game-container"></div>
+
+    <script>
+        // Simulated assets directory structure
+        // In reality, you would need to create this directory structure with actual images
+        function getRandomImageForLetter(letter) {
+            // This is a placeholder that creates a colored rectangle with the letter
+            // Replace this with actual image loading from your assets directory
+            return `/api/placeholder/100/100`;
+        }
+
+        function generateGame() {
+            const sentence = document.getElementById('sentence-input').value;
+            const gameContainer = document.getElementById('game-container');
+            gameContainer.innerHTML = '';
+
+            const words = sentence.split(' ');
+
+            words.forEach((word, wordIndex) => {
+                const wordContainer = document.createElement('div');
+                wordContainer.className = 'word-container';
+
+                [...word].forEach((char) => {
+                    if (/[a-zA-Z]/.test(char)) {
+                        // Create letter box for alphabetic characters
+                        const letterBox = document.createElement('div');
+                        letterBox.className = 'letter-box';
+
+                        const imageContainer = document.createElement('div');
+                        imageContainer.className = 'image-container';
+
+                        const img = document.createElement('img');
+                        img.src = getRandomImageForLetter(char.toLowerCase());
+                        img.alt = `Image for letter ${char}`;
+
+                        const letterLine = document.createElement('div');
+                        letterLine.className = 'letter-line';
+
+                        imageContainer.appendChild(img);
+                        letterBox.appendChild(imageContainer);
+                        letterBox.appendChild(letterLine);
+                        wordContainer.appendChild(letterBox);
+                    } else {
+                        // Create punctuation element
+                        const punctuation = document.createElement('div');
+                        punctuation.className = 'punctuation';
+                        punctuation.textContent = char;
+                        wordContainer.appendChild(punctuation);
+                    }
+                });
+
+                gameContainer.appendChild(wordContainer);
+
+                // Add space between words if not the last word
+                if (wordIndex < words.length - 1) {
+                    const space = document.createElement('div');
+                    space.className = 'space';
+                    gameContainer.appendChild(space);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
