@@ -54,12 +54,14 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            min-height: 200px;
         }
 
         .word-container {
             display: inline-flex;
-            align-items: center;
+            align-items: flex-start;
             margin: 5px;
+            min-height: 250px;
         }
 
         .letter-box {
@@ -69,6 +71,8 @@
             margin: 0 2px;
             gap: 10px;
             padding-top: 100px;
+            width: 100px; /* Fixed width */
+            height: 250px; /* Fixed height */
         }
 
         .letter-line {
@@ -93,11 +97,16 @@
             width: 100px;
             height: 100px;
             order: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .image-container img {
-            width: 100%;
-            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
             object-fit: contain;
         }
 
@@ -135,7 +144,7 @@
             const letterDir = letter.toLowerCase();
             // Using GitHub raw content URL pattern
             // Replace 'your-username/your-repo' with your actual GitHub username and repository name
-            return `https://raw.githubusercontent.com/314esther/Secret_sentence_generator/main/${letterDir}/apple.png`;
+            return `https://raw.githubusercontent.com/314esther/Secret_sentence_generator/main/${letterDir}/first.png`;
         }
 
         async function generateGame() {
