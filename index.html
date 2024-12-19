@@ -4,32 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Letter Learning Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
+            min-height: 100vh;
             background-color: #f0f0f0;
-            width: calc(100% - 40px); /* Full viewport width minus padding */
         }
 
-        h1 {
+        .top-bar {
             width: 100%;
-            margin-top: 0;
+            background-color: #f8f9fa;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
         }
 
-        #input-container {
-            margin-bottom: 20px;
-            width: 100%;
-            display: flex;
+        .input-group {
+            display: inline-flex;
             gap: 10px;
+            align-items: center;
         }
 
-        input[type="text"] {
-            flex-grow: 1;
+        #sentence-input {
+            width: 500px;
             padding: 10px;
             font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
 
         button {
@@ -38,7 +49,7 @@
             color: white;
             border: none;
             cursor: pointer;
-            white-space: nowrap;
+            border-radius: 4px;
         }
 
         #generate-btn {
@@ -57,17 +68,100 @@
             background-color: #1976D2;
         }
 
-        #game-container {
-            background-color: white;
+        .content-area {
             padding: 20px;
-            width: 100%;
-            box-sizing: border-box;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .worksheet {
+            width: 1056px; /* 11 inches */
+            min-height: 816px; /* 8.5 inches */
+            background: white;
+            padding: 40px;
+            position: relative;
+            border: none;
+            background-image: 
+                /* Top */
+                linear-gradient(-45deg, transparent 33.333%, #000 33.333%, #000 66.667%, transparent 66.667%),
+                linear-gradient(45deg, transparent 33.333%, #000 33.333%, #000 66.667%, transparent 66.667%),
+                /* Right */
+                linear-gradient(45deg, transparent 33.333%, #000 33.333%, #000 66.667%, transparent 66.667%),
+                linear-gradient(-45deg, transparent 33.333%, #000 33.333%, #000 66.667%, transparent 66.667%),
+                /* Bottom */
+                linear-gradient(-45deg, transparent 33.333%, #000 33.333%, #000 66.667%, transparent 66.667%),
+                linear-gradient(45deg, transparent 33.333%, #000 33.333%, #000 66.667%, transparent 66.667%),
+                /* Left */
+                linear-gradient(45deg, transparent 33.333%, #000 33.333%, #000 66.667%, transparent 66.667%),
+                linear-gradient(-45deg, transparent 33.333%, #000 33.333%, #000 66.667%, transparent 66.667%);
+            background-size: 
+                30px 15px,
+                30px 15px,
+                15px 30px,
+                15px 30px,
+                30px 15px,
+                30px 15px,
+                15px 30px,
+                15px 30px;
+            background-position: 
+                0 0, 0 0,
+                right 0 top, right 0 top,
+                0 bottom, 0 bottom,
+                0 0, 0 0;
+            background-repeat: repeat-x, repeat-x,
+                             repeat-y, repeat-y,
+                             repeat-x, repeat-x,
+                             repeat-y, repeat-y;
+        }
+
+        /* Add white background inside the border */
+        .worksheet::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            background: white;
+            z-index: -1;
+        }
+
+        .name-section {
+            position: absolute;
+            top: 30px;
+            left: 40px;
+            font-size: 18px;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .name-line {
+            display: inline-block;
+            width: 300px;
+            height: 2px;
+            background-color: black;
+            position: relative;
+            top: -4px;
+        }
+
+        .worksheet-title {
+            text-align: center;
+            font-size: 46px;
+            margin: 60px 0 30px 0;
+            color: #2c3e50;
+            font-family: 'Baloo 2', system-ui, -apple-system, sans-serif;
+            font-weight: 800;
+            text-shadow: 3px 3px 0px rgba(0,0,0,0.15);
+        }
+
+        #game-container {
+            margin-top: 20px;
             display: flex;
             flex-wrap: wrap;
+            gap: 10px;
             align-items: flex-start;
-            min-height: 776px;
         }
 
         .word-container {
@@ -97,16 +191,6 @@
             position: relative;
         }
 
-        .letter-line::before {
-            content: "•";
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #ccc;
-            font-size: 8px;
-        }
-
         .image-container {
             width: 60px;
             height: 60px;
@@ -133,42 +217,50 @@
             display: inline-flex;
             font-size: 24px;
             margin: 0 5px;
-            /* Reduce padding to align with where letters would be written */
             padding-top: 65px;
             height: 180px;
             align-items: flex-start;
         }
 
+        .answer-section {
+            display: none;
+        }
+
         @media print {
-            body {
-                background: none;
-                padding: 0;
-                margin: 0;
-                width: 11in;
-            }
-
-            #game-container {
-                box-shadow: none;
-                border-radius: 0;
-                padding: 20px;
-                width: 100%;
-                min-height: 8.5in;
-            }
-
-            #input-container, h1 {
+            .top-bar {
                 display: none;
+            }
+
+            .worksheet {
+                border: none;
+                width: 11in;
+                height: 8.5in;
+                padding: 0.5in;
             }
         }
     </style>
 </head>
 <body>
-    <h1>Letter Learning Game</h1>
-    <div id="input-container">
-        <input type="text" id="sentence-input" placeholder="Enter a sentence">
-        <button id="generate-btn" onclick="generateGame()">Generate Game</button>
-        <button id="download-btn" onclick="downloadImage()">Download PNG</button>
+    <div class="top-bar">
+        <div class="input-group">
+            <input type="text" id="sentence-input" placeholder="Enter a sentence">
+            <button id="generate-btn" onclick="generateGame()">Generate Game</button>
+            <button id="download-btn" onclick="downloadImage()">Download PNG</button>
+        </div>
     </div>
-    <div id="game-container"></div>
+
+    <div class="content-area">
+        <div class="worksheet">
+            <div class="name-section">
+                <span>Name:</span>
+                <div class="name-line"></div>
+            </div>
+
+            <div class="worksheet-title">Secret Sentence!</div>
+
+            <div id="game-container"></div>
+        </div>
+    </div>
 
     <script>
         // Hide download button initially
@@ -176,7 +268,7 @@
             document.getElementById('download-btn').style.display = 'none';
         };
 
-        // Function to get random image path for letter
+        // Function to get image path for letter
         async function getImageForLetter(letter) {
             const letterDir = letter.toLowerCase();
             try {
@@ -231,7 +323,6 @@
                         img.src = await getImageForLetter(char);
                         img.alt = `Image for letter ${char}`;
                         
-                        // Add fixed size to placeholder images
                         if (img.src.includes('/api/placeholder/')) {
                             img.style.width = '60px';
                             img.style.height = '60px';
@@ -265,10 +356,10 @@
         }
 
         async function downloadImage() {
-            const gameContainer = document.getElementById('game-container');
+            const worksheet = document.querySelector('.worksheet');
             
             try {
-                const canvas = await html2canvas(gameContainer, {
+                const canvas = await html2canvas(worksheet, {
                     backgroundColor: 'white',
                     scale: 2,
                     useCORS: true
