@@ -134,18 +134,14 @@
         async function getImageForLetter(letter) {
             const letterDir = letter.toLowerCase();
             try {
-                const directoryContent = await window.fs.readFile(`./${letterDir}`);
-                const files = JSON.parse(new TextDecoder().decode(directoryContent));
-                const pngFiles = files.filter(file => file.toLowerCase().endsWith('.png'));
-                
-                if (pngFiles.length > 0) {
-                    // Get a random PNG file from the directory
-                    const randomIndex = Math.floor(Math.random() * pngFiles.length);
-                    return `./${letterDir}/${pngFiles[randomIndex]}`;
+                // Try to fetch the file directly
+                const response = await fetch(`./${letterDir}/first.png`);
+                if (!response.ok) {
+                    throw new Error(`Image not found in ${letterDir} directory`);
                 }
-                throw new Error(`No PNG files found in ${letterDir} directory`);
+                return `./${letterDir}/first.png`;
             } catch (error) {
-                console.error(`Error accessing images for letter ${letter}:`, error);
+                console.error(`Error accessing image for letter ${letter}:`, error);
                 return `/api/placeholder/100/100`;
             }
         }
