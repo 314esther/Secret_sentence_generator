@@ -27,14 +27,26 @@
         button {
             padding: 10px 20px;
             font-size: 16px;
-            background-color: #4CAF50;
             color: white;
             border: none;
             cursor: pointer;
+            margin: 0 5px;
         }
 
-        button:hover {
+        #generate-btn {
+            background-color: #4CAF50;
+        }
+
+        #generate-btn:hover {
             background-color: #45a049;
+        }
+
+        #download-btn {
+            background-color: #2196F3;
+        }
+
+        #download-btn:hover {
+            background-color: #1976D2;
         }
 
         #game-container {
@@ -51,22 +63,24 @@
         }
 
         .letter-box {
-            display: inline-flex;
+            display: flex;
             flex-direction: column;
             align-items: center;
             margin: 0 2px;
+            gap: 10px;
         }
 
         .letter-line {
             width: 80px;
             height: 2px;
             background-color: #000;
-            margin-bottom: 10px;
+            order: 1;
         }
 
         .image-container {
             width: 100px;
             height: 100px;
+            order: 2;
         }
 
         .image-container img {
@@ -93,8 +107,8 @@
     <h1>Letter Learning Game</h1>
     <div id="input-container">
         <input type="text" id="sentence-input" placeholder="Enter a sentence">
-        <button onclick="generateGame()">Generate Game</button>
-        <button onclick="downloadImage()" id="download-btn" style="display: none; background-color: #2196F3;">Download PNG</button>
+        <button onclick="generateGame()" id="generate-btn">Generate Game</button>
+        <button onclick="downloadImage()" id="download-btn">Download PNG</button>
     </div>
     <div id="game-container"></div>
 
@@ -159,6 +173,10 @@
 
             // Show download button after generating the game
             document.getElementById('download-btn').style.display = 'inline-block';
+            // Hide the button initially when the page loads
+            window.onload = function() {
+                document.getElementById('download-btn').style.display = 'none';
+            };
         }
 
         async function downloadImage() {
