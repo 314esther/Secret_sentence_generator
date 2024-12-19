@@ -8,18 +8,26 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            margin: 0;
             padding: 20px;
             background-color: #f0f0f0;
+            width: calc(100% - 40px); /* Full viewport width minus padding */
+        }
+
+        h1 {
+            width: 100%;
+            margin-top: 0;
         }
 
         #input-container {
             margin-bottom: 20px;
+            width: 100%;
+            display: flex;
+            gap: 10px;
         }
 
         input[type="text"] {
-            width: 70%;
+            flex-grow: 1;
             padding: 10px;
             font-size: 16px;
         }
@@ -30,7 +38,7 @@
             color: white;
             border: none;
             cursor: pointer;
-            margin: 0 5px;
+            white-space: nowrap;
         }
 
         #generate-btn {
@@ -52,16 +60,22 @@
         #game-container {
             background-color: white;
             padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            min-height: 200px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            min-height: 776px;
         }
 
         .word-container {
             display: inline-flex;
             align-items: flex-start;
             margin: 5px;
-            min-height: 250px;
+            min-height: 180px;
+            flex-wrap: wrap;
         }
 
         .letter-box {
@@ -70,13 +84,13 @@
             align-items: center;
             margin: 0 2px;
             gap: 10px;
-            padding-top: 100px;
-            width: 100px; /* Fixed width */
-            height: 250px; /* Fixed height */
+            padding-top: 80px;
+            width: 60px;
+            height: 180px;
         }
 
         .letter-line {
-            width: 80px;
+            width: 50px;
             height: 2px;
             background-color: #000;
             order: 1;
@@ -94,8 +108,8 @@
         }
 
         .image-container {
-            width: 100px;
-            height: 100px;
+            width: 60px;
+            height: 60px;
             order: 2;
             display: flex;
             align-items: center;
@@ -103,8 +117,8 @@
         }
 
         .image-container img {
-            max-width: 100%;
-            max-height: 100%;
+            max-width: 60px;
+            max-height: 60px;
             width: auto;
             height: auto;
             object-fit: contain;
@@ -121,6 +135,27 @@
             margin: 0 5px;
             align-self: flex-end;
             margin-bottom: 10px;
+        }
+
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+                margin: 0;
+                width: 11in;
+            }
+
+            #game-container {
+                box-shadow: none;
+                border-radius: 0;
+                padding: 20px;
+                width: 100%;
+                min-height: 8.5in;
+            }
+
+            #input-container, h1 {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -142,21 +177,10 @@
         // Function to get image path for letter
         function getImageForLetter(letter) {
             const letterDir = letter.toLowerCase();
-            // Using GitHub raw content URL pattern
-            // Replace 'your-username/your-repo' with your actual GitHub username and repository name
-            const imagePath = `https://raw.githubusercontent.com/your-username/your-repo/main/${letterDir}/first.png`;
-            
-            // Create new image to test loading
-            const img = new Image();
-            img.src = imagePath;
-            
-            return new Promise((resolve) => {
-                img.onload = () => resolve(imagePath);
-                img.onerror = () => resolve('/api/placeholder/100/100');
-            });
+            return `https://raw.githubusercontent.com/your-username/your-repo/main/${letterDir}/first.png`;
         }
 
-        async function generateGame() {
+        function generateGame() {
             const sentence = document.getElementById('sentence-input').value;
             const gameContainer = document.getElementById('game-container');
             gameContainer.innerHTML = '';
@@ -176,17 +200,14 @@
                         imageContainer.className = 'image-container';
 
                         const img = document.createElement('img');
-                        // Wait for the image path resolution
-                        img.src = await getImageForLetter(char);
+                        img.src = getImageForLetter(char);
                         img.alt = `Image for letter ${char}`;
+                        
                         // Add fixed size to placeholder images
                         if (img.src.includes('/api/placeholder/')) {
                             img.style.width = '60px';
                             img.style.height = '60px';
                         }
-                        img.onerror = function() {
-                            this.src = `/api/placeholder/100/100`;
-                        };
 
                         const letterLine = document.createElement('div');
                         letterLine.className = 'letter-line';
