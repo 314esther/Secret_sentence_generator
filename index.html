@@ -125,26 +125,47 @@
     <div id="game-container"></div>
 
     <script>
-        // Simulated assets directory structure
-        // In reality, you would need to create this directory structure with actual images
-        function getRandomImageForLetter(letter) {
-            // This is a placeholder that creates a colored rectangle with the letter
-            // Replace this with actual image loading from your assets directory
-            return `/api/placeholder/100/100`;
+        // Function to get random image from letter directory
+        async function getRandomImageForLetter(letter) {
+            // Convert to lowercase since both upper and lower case use same directory
+            const letterDir = letter.toLowerCase();
+            
+            try {
+                // Fetch list of images from the letter's directory
+                const response = await fetch(`/${letterDir}/`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch images for letter ${letterDir}`);
+                }
+                
+                const files = await response.json();
+                const pngFiles = files.filter(file => file.toLowerCase().endsWith('.png'));
+                
+                if (pngFiles.length === 0) {
+                    throw new Error(`No PNG images found for letter ${letterDir}`);
+                }
+                
+                // Select random image from available files
+                const randomIndex = Math.floor(Math.random() * pngFiles.length);
+                return `/${letterDir}/${pngFiles[randomIndex]}`;
+            } catch (error) {
+                console.error(`Error fetching image for letter ${letterDir}:`, error);
+                // Return placeholder if image fetch fails
+                return `/api/placeholder/100/100`;
+            }
         }
 
-        function generateGame() {
+        async function generateGame() {
             const sentence = document.getElementById('sentence-input').value;
             const gameContainer = document.getElementById('game-container');
             gameContainer.innerHTML = '';
 
             const words = sentence.split(' ');
 
-            words.forEach((word, wordIndex) => {
+            for (const [wordIndex, word] of words.entries()) {
                 const wordContainer = document.createElement('div');
                 wordContainer.className = 'word-container';
 
-                [...word].forEach((char) => {
+                for (const char of word) {
                     if (/[a-zA-Z]/.test(char)) {
                         // Create letter box for alphabetic characters
                         const letterBox = document.createElement('div');
@@ -154,7 +175,8 @@
                         imageContainer.className = 'image-container';
 
                         const img = document.createElement('img');
-                        img.src = getRandomImageForLetter(char.toLowerCase());
+                        // Await the image path
+                        img.src = await getRandomImageForLetter(char);
                         img.alt = `Image for letter ${char}`;
 
                         const letterLine = document.createElement('div');
@@ -171,6 +193,7 @@
                         punctuation.textContent = char;
                         wordContainer.appendChild(punctuation);
                     }
+                    }
                 });
 
                 gameContainer.appendChild(wordContainer);
@@ -181,7 +204,16 @@
                     space.className = 'space';
                     gameContainer.appendChild(space);
                 }
-            });
+
+                gameContainer.appendChild(wordContainer);
+
+                // Add space between words if not the last word
+                if (wordIndex < words.length - 1) {
+                    const space = document.createElement('div');
+                    space.className = 'space';
+                    gameContainer.appendChild(space);
+                }
+            }
 
             // Show download button after generating the game
             document.getElementById('download-btn').style.display = 'inline-block';
