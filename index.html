@@ -131,23 +131,37 @@
         };
 
         // Function to get image path for letter
-        function getImageForLetter(letter) {
+        async function getImageForLetter(letter) {
             const letterDir = letter.toLowerCase();
-            return `./${letterDir}/image.png`;  // Using relative path with ./
+            try {
+                const directoryContent = await window.fs.readFile(`./${letterDir}`);
+                const files = JSON.parse(new TextDecoder().decode(directoryContent));
+                const pngFiles = files.filter(file => file.toLowerCase().endsWith('.png'));
+                
+                if (pngFiles.length > 0) {
+                    // Get a random PNG file from the directory
+                    const randomIndex = Math.floor(Math.random() * pngFiles.length);
+                    return `./${letterDir}/${pngFiles[randomIndex]}`;
+                }
+                throw new Error(`No PNG files found in ${letterDir} directory`);
+            } catch (error) {
+                console.error(`Error accessing images for letter ${letter}:`, error);
+                return `/api/placeholder/100/100`;
+            }
         }
 
-        function generateGame() {
+        async function generateGame() {
             const sentence = document.getElementById('sentence-input').value;
             const gameContainer = document.getElementById('game-container');
             gameContainer.innerHTML = '';
 
             const words = sentence.split(' ');
 
-            words.forEach((word, wordIndex) => {
+            for (const [wordIndex, word] of words.entries()) {
                 const wordContainer = document.createElement('div');
                 wordContainer.className = 'word-container';
 
-                [...word].forEach(char => {
+                for (const char of word) {
                     if (/[a-zA-Z]/.test(char)) {
                         const letterBox = document.createElement('div');
                         letterBox.className = 'letter-box';
@@ -156,7 +170,7 @@
                         imageContainer.className = 'image-container';
 
                         const img = document.createElement('img');
-                        img.src = getImageForLetter(char);
+                        img.src = await getImageForLetter(char);
                         img.alt = `Image for letter ${char}`;
                         img.onerror = function() {
                             this.src = `/api/placeholder/100/100`;
@@ -175,7 +189,7 @@
                         punctuation.textContent = char;
                         wordContainer.appendChild(punctuation);
                     }
-                });
+                }
 
                 gameContainer.appendChild(wordContainer);
 
@@ -184,7 +198,7 @@
                     space.className = 'space';
                     gameContainer.appendChild(space);
                 }
-            });
+            }
 
             document.getElementById('download-btn').style.display = 'inline-block';
         }
