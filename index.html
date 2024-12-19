@@ -176,13 +176,30 @@
             document.getElementById('download-btn').style.display = 'none';
         };
 
-        // Function to get image path for letter
-        function getImageForLetter(letter) {
+        // Function to get random image path for letter
+        async function getImageForLetter(letter) {
             const letterDir = letter.toLowerCase();
-            return `https://raw.githubusercontent.com/your-username/your-repo/main/${letterDir}/first.png`;
+            try {
+                // Get directory contents
+                const directoryContents = await window.fs.readFile(`./${letterDir}`);
+                // Parse directory contents to get list of files
+                const files = JSON.parse(new TextDecoder().decode(directoryContents));
+                // Filter for PNG files
+                const pngFiles = files.filter(file => file.toLowerCase().endsWith('.png'));
+                
+                if (pngFiles.length > 0) {
+                    // Select random PNG file
+                    const randomIndex = Math.floor(Math.random() * pngFiles.length);
+                    return `./${letterDir}/${pngFiles[randomIndex]}`;
+                }
+                throw new Error(`No PNG files found in ${letterDir} directory`);
+            } catch (error) {
+                console.error(`Error accessing images for letter ${letter}:`, error);
+                return `/api/placeholder/60/60`;
+            }
         }
 
-        function generateGame() {
+        async function generateGame() {
             const sentence = document.getElementById('sentence-input').value;
             const gameContainer = document.getElementById('game-container');
             gameContainer.innerHTML = '';
@@ -202,7 +219,7 @@
                         imageContainer.className = 'image-container';
 
                         const img = document.createElement('img');
-                        img.src = getImageForLetter(char);
+                        img.src = await getImageForLetter(char);
                         img.alt = `Image for letter ${char}`;
                         
                         // Add fixed size to placeholder images
