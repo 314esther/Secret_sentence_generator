@@ -133,7 +133,7 @@
         // Function to get image path for letter
         function getImageForLetter(letter) {
             const letterDir = letter.toLowerCase();
-            return `/${letterDir}/image.png`;
+            return `./${letterDir}/image.png`;  // Using relative path with ./
         }
 
         function generateGame() {
