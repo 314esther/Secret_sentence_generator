@@ -68,6 +68,7 @@
             align-items: center;
             margin: 0 2px;
             gap: 10px;
+            padding-top: 30px;  /* Space for writing above the line */
         }
 
         .letter-line {
@@ -75,6 +76,17 @@
             height: 2px;
             background-color: #000;
             order: 1;
+            position: relative;  /* For the guide dot */
+        }
+
+        .letter-line::before {
+            content: "•";
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ccc;
+            font-size: 8px;
         }
 
         .image-container {
