@@ -144,7 +144,7 @@
             const letterDir = letter.toLowerCase();
             // Using GitHub raw content URL pattern
             // Replace 'your-username/your-repo' with your actual GitHub username and repository name
-            const imagePath = `https://raw.githubusercontent.com/314esther/Secret_sentence_generator/main/${letterDir}/first.png`;
+            const imagePath = `https://raw.githubusercontent.com/your-username/your-repo/main/${letterDir}/first.png`;
             
             // Create new image to test loading
             const img = new Image();
@@ -181,8 +181,8 @@
                         img.alt = `Image for letter ${char}`;
                         // Add fixed size to placeholder images
                         if (img.src.includes('/api/placeholder/')) {
-                            img.style.width = '100px';
-                            img.style.height = '100px';
+                            img.style.width = '60px';
+                            img.style.height = '60px';
                         }
                         img.onerror = function() {
                             this.src = `/api/placeholder/100/100`;
